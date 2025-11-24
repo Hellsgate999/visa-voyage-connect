@@ -1,376 +1,189 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { GraduationCap, Plane, Globe, Users, MessageSquare, Map, Building2, Award, ChevronRight, ArrowRight, Star, CheckCircle, Sparkles, Rocket, TrendingUp, Clock, Shield, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { GraduationCap, Plane, Globe2, Users, ArrowRight, CheckCircle2, Star, Award, Shield, Sparkles, MapPin, BookOpen, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useRef } from 'react';
 import AuthHeader from '@/components/layout/AuthHeader';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 const Index = () => {
   const navigate = useNavigate();
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
 
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
-
-  const educationDestinations = [
+  const features = [
     {
-      name: "United States",
-      image: "https://images.pexels.com/photos/2346091/pexels-photo-2346091.jpeg?auto=compress&cs=tinysrgb&w=800",
-      universities: "200+",
-      students: "50,000+",
-      flag: "🇺🇸",
-      color: "from-blue-500 to-red-500"
+      icon: <GraduationCap className="h-6 w-6" />,
+      title: "Study Abroad",
+      description: "Access top universities in 50+ countries",
+      stat: "10K+ Students"
     },
     {
-      name: "United Kingdom",
-      image: "https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=800",
-      universities: "150+",
-      students: "30,000+",
-      flag: "🇬🇧",
-      color: "from-blue-600 to-red-600"
+      icon: <Plane className="h-6 w-6" />,
+      title: "Tourism Visa",
+      description: "Explore 195+ destinations hassle-free",
+      stat: "99% Success"
     },
     {
-      name: "Canada",
-      image: "https://images.pexels.com/photos/2849339/pexels-photo-2849339.jpeg?auto=compress&cs=tinysrgb&w=800",
-      universities: "100+",
-      students: "40,000+",
-      flag: "🇨🇦",
-      color: "from-red-500 to-white"
+      icon: <Shield className="h-6 w-6" />,
+      title: "Visa Support",
+      description: "Expert guidance from application to approval",
+      stat: "24/7 Available"
     },
     {
-      name: "Australia",
-      image: "https://images.pexels.com/photos/995764/pexels-photo-995764.jpeg?auto=compress&cs=tinysrgb&w=800",
-      universities: "80+",
-      students: "25,000+",
-      flag: "🇦🇺",
-      color: "from-blue-500 to-yellow-500"
-    },
-    {
-      name: "Germany",
-      image: "https://images.pexels.com/photos/2034335/pexels-photo-2034335.jpeg?auto=compress&cs=tinysrgb&w=800",
-      universities: "120+",
-      students: "35,000+",
-      flag: "🇩🇪",
-      color: "from-black to-red-600"
-    },
-    {
-      name: "Singapore",
-      image: "https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=800",
-      universities: "30+",
-      students: "15,000+",
-      flag: "🇸🇬",
-      color: "from-red-500 to-white"
+      icon: <Users className="h-6 w-6" />,
+      title: "Community",
+      description: "Connect with global travelers & students",
+      stat: "50K+ Members"
     }
   ];
 
-  const tourismDestinations = [
+  const countries = [
     {
-      name: "France",
-      image: "https://images.pexels.com/photos/2363/france-landmark-lights-night.jpg?auto=compress&cs=tinysrgb&w=800",
-      attractions: "Historic Sites",
-      rating: "4.9",
-      flag: "🇫🇷",
-      visitors: "89M/year"
+      name: "United States",
+      image: "https://images.pexels.com/photos/378570/pexels-photo-378570.jpeg?auto=compress&cs=tinysrgb&w=600",
+      universities: "200+",
+      type: "Education"
     },
     {
-      name: "Italy",
-      image: "https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg?auto=compress&cs=tinysrgb&w=800",
-      attractions: "Culture & Art",
-      rating: "4.8",
-      flag: "🇮🇹",
-      visitors: "64M/year"
+      name: "United Kingdom",
+      image: "https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=600",
+      universities: "150+",
+      type: "Education"
+    },
+    {
+      name: "Canada",
+      image: "https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=600",
+      universities: "100+",
+      type: "Education"
+    },
+    {
+      name: "France",
+      image: "https://images.pexels.com/photos/2363/france-landmark-lights-night.jpg?auto=compress&cs=tinysrgb&w=600",
+      visitors: "89M/year",
+      type: "Tourism"
     },
     {
       name: "Japan",
-      image: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=800",
-      attractions: "Modern & Traditional",
-      rating: "4.9",
-      flag: "🇯🇵",
-      visitors: "31M/year"
+      image: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=600",
+      visitors: "31M/year",
+      type: "Tourism"
     },
     {
-      name: "Spain",
-      image: "https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg?auto=compress&cs=tinysrgb&w=800",
-      attractions: "Beach & Architecture",
-      rating: "4.7",
-      flag: "🇪🇸",
-      visitors: "83M/year"
+      name: "Italy",
+      image: "https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg?auto=compress&cs=tinysrgb&w=600",
+      visitors: "64M/year",
+      type: "Tourism"
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: "Priya Sharma",
+      country: "India",
+      text: "Got my UK student visa in just 3 weeks! The guidance was exceptional.",
+      image: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150"
+    },
+    {
+      name: "David Chen",
+      country: "China",
+      text: "Best platform for visa assistance. Helped me with every single step.",
+      image: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150"
+    },
+    {
+      name: "Maria Garcia",
+      country: "Mexico",
+      text: "Community support is amazing! Connected with students worldwide.",
+      image: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-white">
       <AuthHeader />
 
-      <section ref={containerRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-900 via-slate-800 to-blue-900">
-        <motion.div style={{ y, opacity }} className="absolute inset-0 bg-[url('https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center opacity-10"></motion.div>
+      <section className="relative pt-20 pb-32 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+        <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 pt-16">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-5xl mx-auto text-center"
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto text-center"
           >
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-blue-500/10 backdrop-blur-sm border border-blue-400/30 rounded-full px-5 py-2 mb-8"
-            >
-              <Sparkles className="h-5 w-5 text-blue-300" />
-              <span className="text-blue-200 font-medium">Your Gateway to Global Opportunities</span>
-            </motion.div>
+            <div className="inline-flex items-center gap-2 bg-blue-100 rounded-full px-4 py-2 mb-6">
+              <Sparkles className="h-4 w-4 text-blue-600" />
+              <span className="text-blue-900 text-sm font-medium">Trusted by 50,000+ Students & Travelers</span>
+            </div>
 
-            <h1 className="text-6xl md:text-8xl font-black text-white mb-6 leading-tight">
-              Explore the World
-              <br />
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Your Way
+            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 leading-tight">
+              Your Journey to
+              <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                Study & Travel Abroad
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Discover education opportunities and tourism destinations across 195+ countries.
-              Get expert visa assistance and connect with a global community.
+            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              Expert visa assistance, university guidance, and travel support for 195+ countries.
+              Start your global journey today.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               <Button
                 onClick={() => navigate('/countries')}
                 size="lg"
-                className="group bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-7 text-lg font-semibold shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 Explore Countries
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-
               <Button
                 onClick={() => navigate('/visa-services')}
                 size="lg"
                 variant="outline"
-                className="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 px-8 py-7 text-lg font-semibold"
+                className="border-2 border-gray-300 hover:border-blue-600 hover:bg-blue-50 px-8 h-14 text-lg font-semibold"
               >
+                <Shield className="mr-2 h-5 w-5" />
                 Visa Services
               </Button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[
-                { icon: <Users className="h-8 w-8" />, number: "50K+", label: "Students Helped" },
-                { icon: <Globe className="h-8 w-8" />, number: "195+", label: "Countries" },
-                { icon: <Award className="h-8 w-8" />, number: "99%", label: "Success Rate" },
-                { icon: <Shield className="h-8 w-8" />, number: "24/7", label: "Support" }
-              ].map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1 }}
-                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300"
-                >
-                  <div className="text-blue-300 mb-3 flex justify-center">{stat.icon}</div>
-                  <div className="text-4xl font-bold text-white mb-1">{stat.number}</div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
-                </motion.div>
-              ))}
+            <div className="flex items-center justify-center gap-8 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <span>Free Consultation</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <span>99% Success Rate</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <span>24/7 Support</span>
+              </div>
             </div>
           </motion.div>
         </div>
 
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-white/50"
-          >
-            <ChevronRight className="h-8 w-8 rotate-90" />
-          </motion.div>
-        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
       </section>
 
-      <section className="py-24 bg-white">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <div className="inline-flex items-center gap-2 bg-blue-50 rounded-full px-4 py-2 mb-4">
-              <GraduationCap className="h-5 w-5 text-blue-600" />
-              <span className="text-blue-900 font-semibold text-sm">Education Abroad</span>
-            </div>
-            <h2 className="text-5xl font-black text-gray-900 mb-4">
-              Top Study Destinations
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Access world-class universities and educational opportunities
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {educationDestinations.map((destination, index) => (
-              <motion.div
-                key={destination.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -10, scale: 1.02 }}
-              >
-                <Card className="overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 border-0">
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={destination.image}
-                      alt={destination.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                    <div className="absolute top-4 right-4 text-6xl">{destination.flag}</div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-3xl font-bold text-white mb-2">{destination.name}</h3>
-                      <div className="flex items-center gap-4 text-white/90 text-sm">
-                        <div className="flex items-center gap-1">
-                          <Building2 className="h-4 w-4" />
-                          {destination.universities}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          {destination.students}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Button
-              onClick={() => navigate('/countries')}
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-6 text-lg"
-            >
-              View All Education Countries
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 bg-gradient-to-br from-blue-50 to-cyan-50">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <div className="inline-flex items-center gap-2 bg-cyan-100 rounded-full px-4 py-2 mb-4">
-              <Plane className="h-5 w-5 text-cyan-600" />
-              <span className="text-cyan-900 font-semibold text-sm">Travel & Tourism</span>
-            </div>
-            <h2 className="text-5xl font-black text-gray-900 mb-4">
-              Popular Travel Destinations
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Explore breathtaking destinations and create unforgettable memories
-            </p>
-          </motion.div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tourismDestinations.map((destination, index) => (
-              <motion.div
-                key={destination.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -8 }}
-              >
-                <Card className="overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300">
-                  <div className="relative h-72 overflow-hidden">
-                    <img
-                      src={destination.image}
-                      alt={destination.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-                    <div className="absolute top-4 right-4 text-5xl animate-bounce">{destination.flag}</div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-2xl font-bold text-white mb-2">{destination.name}</h3>
-                      <div className="flex items-center justify-between text-white/90 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          {destination.rating}
-                        </span>
-                        <span className="text-xs">{destination.visitors}</span>
-                      </div>
-                      <div className="mt-2 text-white/80 text-sm">{destination.attractions}</div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Button
-              onClick={() => navigate('/countries')}
-              size="lg"
-              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-8 py-6 text-lg"
-            >
-              Explore All Tourism Destinations
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <MessageSquare className="h-12 w-12" />,
-                title: "Community",
-                description: "Connect with students and travelers worldwide",
-                color: "from-purple-500 to-pink-500"
-              },
-              {
-                icon: <Map className="h-12 w-12" />,
-                title: "Visa Services",
-                description: "Expert guidance for all your visa requirements",
-                color: "from-blue-500 to-cyan-500"
-              },
-              {
-                icon: <Clock className="h-12 w-12" />,
-                title: "24/7 Support",
-                description: "Round-the-clock assistance for your journey",
-                color: "from-orange-500 to-red-500"
-              }
-            ].map((feature, index) => (
+            {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-                whileHover={{ scale: 1.05 }}
+                transition={{ delay: index * 0.1 }}
               >
-                <Card className="p-8 text-center hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-blue-200">
-                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} text-white mb-4`}>
+                <Card className="p-6 h-full border-2 hover:border-blue-600 hover:shadow-lg transition-all duration-300 group cursor-pointer">
+                  <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     {feature.icon}
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-gray-600 text-sm mb-3">{feature.description}</p>
+                  <div className="text-blue-600 font-semibold text-sm">{feature.stat}</div>
                 </Card>
               </motion.div>
             ))}
@@ -378,40 +191,234 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-24 bg-gradient-to-br from-blue-900 via-slate-800 to-blue-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?auto=compress&cs=tinysrgb&w=1920')] opacity-5 bg-cover bg-center"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center"
-          >
-            <h2 className="text-5xl font-black mb-6">Ready to Start Your Journey?</h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Join thousands of students and travelers who trust us
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Popular Destinations
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Explore top countries for education and tourism
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button
-                onClick={() => navigate('/countries')}
-                size="lg"
-                className="bg-white text-blue-900 hover:bg-gray-100 px-8 py-6 text-lg font-bold"
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {countries.map((country, index) => (
+              <motion.div
+                key={country.name}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
               >
-                Get Started Now
-                <Rocket className="ml-2 h-5 w-5" />
-              </Button>
-              <Button
-                onClick={() => navigate('/community')}
-                size="lg"
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 px-8 py-6 text-lg"
-              >
-                Join Community
-              </Button>
-            </div>
-          </motion.div>
+                <Card className="overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 border-0">
+                  <div className="relative h-56 overflow-hidden">
+                    <img
+                      src={country.image}
+                      alt={country.name}
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-xs font-semibold">
+                        {country.type}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-2xl font-bold text-white mb-1">{country.name}</h3>
+                      <div className="text-white/90 text-sm">
+                        {country.universities && (
+                          <div className="flex items-center gap-1">
+                            <BookOpen className="h-4 w-4" />
+                            {country.universities} Universities
+                          </div>
+                        )}
+                        {country.visitors && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            {country.visitors}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Button
+              onClick={() => navigate('/countries')}
+              size="lg"
+              className="bg-gray-900 hover:bg-gray-800 text-white px-8 h-12"
+            >
+              View All Countries
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </section>
+
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              What Our Clients Say
+            </h2>
+            <p className="text-xl text-gray-600">
+              Join thousands of satisfied students and travelers
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={testimonial.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+              >
+                <Card className="p-6 h-full border-2 hover:border-blue-600 transition-all">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-6 italic">"{testimonial.text}"</p>
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                      <div className="text-sm text-gray-600">{testimonial.country}</div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-4xl font-bold mb-4">
+                  Ready to Start Your Journey?
+                </h2>
+                <p className="text-blue-100 text-lg mb-6">
+                  Get free consultation from our visa experts and take the first step towards your dream destination.
+                </p>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-cyan-300" />
+                    <span>Free initial consultation</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-cyan-300" />
+                    <span>Expert guidance at every step</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-cyan-300" />
+                    <span>99% visa success rate</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-cyan-300" />
+                    <span>Support until you reach your destination</span>
+                  </li>
+                </ul>
+                <Button
+                  onClick={() => navigate('/visa-services')}
+                  size="lg"
+                  className="bg-white text-blue-600 hover:bg-gray-100 px-8 h-14 text-lg font-semibold"
+                >
+                  Get Started Free
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20 text-white">
+                  <Globe2 className="h-10 w-10 mb-3 text-cyan-300" />
+                  <div className="text-3xl font-bold mb-1">195+</div>
+                  <div className="text-blue-100 text-sm">Countries Covered</div>
+                </Card>
+                <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20 text-white">
+                  <Users className="h-10 w-10 mb-3 text-cyan-300" />
+                  <div className="text-3xl font-bold mb-1">50K+</div>
+                  <div className="text-blue-100 text-sm">Happy Clients</div>
+                </Card>
+                <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20 text-white">
+                  <Award className="h-10 w-10 mb-3 text-cyan-300" />
+                  <div className="text-3xl font-bold mb-1">99%</div>
+                  <div className="text-blue-100 text-sm">Success Rate</div>
+                </Card>
+                <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20 text-white">
+                  <Briefcase className="h-10 w-10 mb-3 text-cyan-300" />
+                  <div className="text-3xl font-bold mb-1">10+</div>
+                  <div className="text-blue-100 text-sm">Years Experience</div>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Globe2 className="h-6 w-6 text-blue-400" />
+                <span className="text-xl font-bold">GlobalVisa</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Your trusted partner for education abroad and international travel.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-4">Services</h3>
+              <div className="space-y-2 text-sm text-gray-400">
+                <div className="hover:text-white cursor-pointer transition-colors">Study Abroad</div>
+                <div className="hover:text-white cursor-pointer transition-colors">Tourism Visa</div>
+                <div className="hover:text-white cursor-pointer transition-colors">Visa Consultation</div>
+                <div className="hover:text-white cursor-pointer transition-colors">Document Support</div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-4">Quick Links</h3>
+              <div className="space-y-2 text-sm text-gray-400">
+                <div onClick={() => navigate('/countries')} className="hover:text-white cursor-pointer transition-colors">Countries</div>
+                <div onClick={() => navigate('/visa-services')} className="hover:text-white cursor-pointer transition-colors">Visa Services</div>
+                <div onClick={() => navigate('/community')} className="hover:text-white cursor-pointer transition-colors">Community</div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-4">Contact</h3>
+              <div className="space-y-2 text-sm text-gray-400">
+                <div>Email: info@globalvisa.com</div>
+                <div>Phone: +1 (555) 123-4567</div>
+                <div>24/7 Support Available</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
+            <p>© 2024 GlobalVisa. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
