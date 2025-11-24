@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Users, GraduationCap, TrendingUp, Calendar } from "lucide-react";
+import { Search, Users, GraduationCap, TrendingUp, Calendar, Globe2, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AuthHeader from "@/components/layout/AuthHeader";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { supabase, VisaRoute } from "@/lib/supabase";
+import { toast } from "sonner";
 
 const allCountries = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
@@ -62,15 +64,6 @@ const featuredCountries = [
     badge: "Education Services"
   },
   {
-    name: "Mexico",
-    image: "https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=800",
-    students: "25,000+",
-    universities: "80+",
-    successRate: "94%",
-    topUniversities: ["UNAM", "Tec de Monterrey", "IPN"],
-    badge: "Education Services"
-  },
-  {
     name: "United Kingdom",
     image: "https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=800",
     students: "30,000+",
@@ -80,39 +73,12 @@ const featuredCountries = [
     badge: "Education Services"
   },
   {
-    name: "Germany",
-    image: "https://images.pexels.com/photos/1440476/pexels-photo-1440476.jpeg?auto=compress&cs=tinysrgb&w=800",
-    students: "35,000+",
-    universities: "120+",
-    successRate: "96%",
-    topUniversities: ["TU Munich", "Heidelberg", "LMU Munich"],
-    badge: "Education Services"
-  },
-  {
-    name: "France",
-    image: "https://images.pexels.com/photos/2363/france-landmark-lights-night.jpg?auto=compress&cs=tinysrgb&w=800",
-    students: "28,000+",
-    universities: "90+",
-    successRate: "95%",
-    topUniversities: ["Sorbonne", "École Polytechnique", "Sciences Po"],
-    badge: "Education Services"
-  },
-  {
-    name: "Italy",
-    image: "https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg?auto=compress&cs=tinysrgb&w=800",
-    students: "22,000+",
-    universities: "70+",
-    successRate: "93%",
-    topUniversities: ["Bologna", "Sapienza", "Politecnico Milano"],
-    badge: "Education Services"
-  },
-  {
-    name: "Spain",
-    image: "https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg?auto=compress&cs=tinysrgb&w=800",
-    students: "20,000+",
-    universities: "65+",
-    successRate: "92%",
-    topUniversities: ["Barcelona", "Complutense", "Pompeu Fabra"],
+    name: "Australia",
+    image: "https://images.pexels.com/photos/995764/pexels-photo-995764.jpeg?auto=compress&cs=tinysrgb&w=800",
+    students: "25,000+",
+    universities: "80+",
+    successRate: "97%",
+    topUniversities: ["Melbourne", "Sydney", "ANU"],
     badge: "Education Services"
   }
 ];
@@ -120,11 +86,65 @@ const featuredCountries = [
 const Countries = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+  const [sourceCountry, setSourceCountry] = useState("India");
+  const [destinationCountries, setDestinationCountries] = useState<string[]>([]);
+  const [visaRoutes, setVisaRoutes] = useState<VisaRoute[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [countrySearchOpen, setCountrySearchOpen] = useState(false);
   const navigate = useNavigate();
 
-  const filteredCountries = allCountries.filter((country) =>
-    country.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    fetchVisaRoutes();
+  }, [sourceCountry]);
+
+  const fetchVisaRoutes = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('country_visa_routes')
+        .select('*')
+        .eq('from_country', sourceCountry)
+        .order('to_country', { ascending: true });
+
+      if (error) throw error;
+
+      if (data) {
+        setVisaRoutes(data);
+        const uniqueDestinations = [...new Set(data.map(route => route.to_country))];
+        setDestinationCountries(uniqueDestinations);
+      }
+    } catch (error) {
+      console.error('Error fetching visa routes:', error);
+      toast.error('Failed to load visa routes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredCountries = destinationCountries.length > 0
+    ? destinationCountries.filter((country) =>
+        country.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : allCountries.filter((country) =>
+        country.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+  const getCountryRouteInfo = (countryName: string) => {
+    const routes = visaRoutes.filter(r => r.to_country === countryName);
+    if (routes.length === 0) return null;
+
+    const studentRoute = routes.find(r => r.visa_type === 'student');
+    const touristRoute = routes.find(r => r.visa_type === 'tourist');
+
+    return {
+      hasStudent: !!studentRoute,
+      hasTourist: !!touristRoute,
+      successRate: studentRoute?.success_rate || touristRoute?.success_rate || '95%',
+      processingTime: studentRoute?.processing_time || touristRoute?.processing_time || '2-4 weeks'
+    };
+  };
+
+  const sourceCountryOptions = ["India", "United States", "United Kingdom", "Canada", "Australia", "China", "Pakistan", "Bangladesh", "Nigeria", "Philippines"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -143,23 +163,102 @@ const Countries = () => {
             Discover education opportunities and visa services across the globe. Find your perfect destination for study and career growth.
           </p>
 
-          <div className="max-w-2xl mx-auto mb-8">
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Globe2 className="h-6 w-6 text-blue-600" />
+                <h3 className="text-lg font-semibold text-gray-900">Select Your Country</h3>
+              </div>
+
+              <div className="relative">
+                <button
+                  onClick={() => setCountrySearchOpen(!countrySearchOpen)}
+                  className="w-full text-left px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 hover:border-blue-400 transition-all flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                      {sourceCountry.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Traveling from</p>
+                      <p className="text-xl font-bold text-gray-900">{sourceCountry}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg">
+                    <span className="text-sm font-semibold text-blue-600">
+                      {destinationCountries.length} Destinations
+                    </span>
+                  </div>
+                </button>
+
+                {countrySearchOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border-2 border-gray-200 max-h-80 overflow-y-auto"
+                  >
+                    <div className="p-4">
+                      <p className="text-sm font-semibold text-gray-700 mb-3">Select your country:</p>
+                      <div className="space-y-2">
+                        {sourceCountryOptions.map((country) => (
+                          <button
+                            key={country}
+                            onClick={() => {
+                              setSourceCountry(country);
+                              setCountrySearchOpen(false);
+                            }}
+                            className={`w-full text-left px-4 py-3 rounded-lg transition-all flex items-center gap-3 ${
+                              sourceCountry === country
+                                ? 'bg-blue-600 text-white'
+                                : 'hover:bg-gray-100'
+                            }`}
+                          >
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                              sourceCountry === country ? 'bg-white text-blue-600' : 'bg-gray-200 text-gray-700'
+                            }`}>
+                              {country.charAt(0)}
+                            </div>
+                            <span className="font-medium">{country}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {loading && (
+                <div className="mt-4 flex items-center justify-center gap-2 text-blue-600">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                  <span>Loading destinations...</span>
+                </div>
+              )}
+
+              {!loading && destinationCountries.length > 0 && (
+                <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center gap-2 text-green-700">
+                    <CheckCircle2 className="h-5 w-5" />
+                    <span className="font-medium">
+                      Found {destinationCountries.length} destinations available from {sourceCountry}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
                 type="text"
-                placeholder="Search countries or colleges..."
+                placeholder="Search destination countries..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-12 pr-4 py-6 text-lg rounded-full border-2 border-gray-200 focus:border-blue-500"
               />
-              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full px-8">
-                Go
-              </Button>
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
             <button
               onClick={() => setActiveFilter("all")}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
@@ -168,30 +267,88 @@ const Countries = () => {
                   : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
-              Top-Ranked
+              All Destinations
             </button>
             <button
-              onClick={() => setActiveFilter("scholarships")}
+              onClick={() => setActiveFilter("student")}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
-                activeFilter === "scholarships"
+                activeFilter === "student"
                   ? "bg-gray-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
-              Scholarships Available
+              Student Visa
             </button>
             <button
-              onClick={() => setActiveFilter("english")}
+              onClick={() => setActiveFilter("tourist")}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
-                activeFilter === "english"
+                activeFilter === "tourist"
                   ? "bg-gray-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
-              English-Taught Programs
+              Tourist Visa
             </button>
           </div>
         </motion.div>
+
+        {destinationCountries.length > 0 && (
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Available Destinations from {sourceCountry}
+            </h2>
+            <p className="text-gray-600 mb-8">Showing visa routes and requirements</p>
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredCountries.map((country, index) => {
+                  const routeInfo = getCountryRouteInfo(country);
+
+                  if (activeFilter === "student" && (!routeInfo || !routeInfo.hasStudent)) return null;
+                  if (activeFilter === "tourist" && (!routeInfo || !routeInfo.hasTourist)) return null;
+
+                  return (
+                    <motion.button
+                      key={country}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.02 }}
+                      onClick={() => navigate(`/country/${country.toLowerCase().replace(/\s+/g, "-")}`)}
+                      className="text-left p-4 bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 rounded-xl transition-all border-2 border-blue-100 hover:border-blue-300 hover:shadow-lg group"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <p className="font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors">
+                          {country}
+                        </p>
+                        {routeInfo && (
+                          <div className="flex gap-1">
+                            {routeInfo.hasStudent && (
+                              <GraduationCap className="h-5 w-5 text-blue-600" title="Student Visa Available" />
+                            )}
+                            {routeInfo.hasTourist && (
+                              <Globe2 className="h-5 w-5 text-green-600" title="Tourist Visa Available" />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      {routeInfo && (
+                        <div className="space-y-1 text-sm">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <TrendingUp className="h-4 w-4 text-green-500" />
+                            <span>{routeInfo.successRate} Success Rate</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Calendar className="h-4 w-4 text-blue-500" />
+                            <span>{routeInfo.processingTime}</span>
+                          </div>
+                        </div>
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Destinations</h2>
@@ -264,51 +421,6 @@ const Countries = () => {
               </motion.div>
             ))}
           </div>
-        </div>
-
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">All Countries</h2>
-          {searchQuery ? (
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <p className="text-sm text-gray-600 mb-4">
-                Found {filteredCountries.length} countries
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {filteredCountries.map((country, index) => (
-                  <motion.button
-                    key={country}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.02 }}
-                    onClick={() => navigate(`/country/${country.toLowerCase().replace(/\s+/g, "-")}`)}
-                    className="text-left p-4 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors border border-gray-200 hover:border-blue-300"
-                  >
-                    <p className="font-medium text-gray-900">{country}</p>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <p className="text-sm text-gray-600 mb-4">
-                Showing {allCountries.length} countries
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {allCountries.map((country, index) => (
-                  <motion.button
-                    key={country}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.01 }}
-                    onClick={() => navigate(`/country/${country.toLowerCase().replace(/\s+/g, "-")}`)}
-                    className="text-left p-4 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors border border-gray-200 hover:border-blue-300"
-                  >
-                    <p className="font-medium text-gray-900">{country}</p>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
