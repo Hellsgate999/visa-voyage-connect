@@ -1,32 +1,28 @@
 import { useState } from "react";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Mail, Lock, User as UserIcon, ArrowRight, CheckCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { Eye, EyeOff, X, Chrome, Github } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 interface AuthModalProps {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
+  mode: 'signin' | 'signup';
 }
 
-const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
-  const [isSignUp, setIsSignUp] = useState(false);
+const AuthModal = ({ open, onClose, mode: initialMode }: AuthModalProps) => {
+  const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (isSignUp && password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
 
     if (password.length < 6) {
       toast.error("Password must be at least 6 characters");
@@ -34,145 +30,187 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     }
 
     setLoading(true);
-    const auth = getAuth();
 
     try {
-      if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
-        toast.success("Account created successfully! Welcome aboard!");
+      if (mode === 'signup') {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast.success("Account created successfully! Please check your email.");
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        toast.success("Welcome back! You're now logged in.");
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast.success("Welcome back!");
       }
+
       onClose();
       setEmail("");
       setPassword("");
-      setConfirmPassword("");
     } catch (error: any) {
-      const errorMessage = error.code === "auth/email-already-in-use"
-        ? "This email is already registered"
-        : error.code === "auth/invalid-email"
-        ? "Please enter a valid email address"
-        : error.code === "auth/user-not-found"
-        ? "No account found with this email"
-        : error.code === "auth/wrong-password"
-        ? "Incorrect password"
-        : "Authentication failed. Please try again.";
-
-      toast.error(errorMessage);
+      toast.error(error.message || "Authentication failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const resetForm = () => {
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || "Google sign in failed");
+    }
   };
 
-  const toggleMode = () => {
-    setIsSignUp(!isSignUp);
-    resetForm();
+  const handleGithubSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || "GitHub sign in failed");
+    }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden border-0">
-        <div className="grid md:grid-cols-1">
-          <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-slate-800 p-8 text-white">
-            <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?auto=compress&cs=tinysrgb&w=600')] opacity-10 bg-cover"></div>
-            <div className="relative z-10">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <h2 className="text-3xl font-bold mb-2">
-                  {isSignUp ? "Create Account" : "Welcome Back"}
-                </h2>
-                <p className="text-blue-100 mb-6">
-                  {isSignUp
-                    ? "Join thousands of travelers and students worldwide"
-                    : "Continue your journey with us"}
-                </p>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden border-0 bg-slate-800/95 backdrop-blur-xl">
+        <div className="relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
+          >
+            <X className="h-5 w-5" />
+          </button>
 
-                {isSignUp && (
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-300" />
-                      <span className="text-sm">Access to 195+ countries</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-300" />
-                      <span className="text-sm">Connect with global community</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-300" />
-                      <span className="text-sm">Expert visa & education guidance</span>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
+          <div className="p-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-2">
+                {mode === 'signin' ? 'Welcome Back' : 'Create Account'}
+              </h2>
+              <p className="text-gray-400">
+                {mode === 'signin'
+                  ? 'Sign in to continue your journey'
+                  : 'Join thousands of travelers worldwide'}
+              </p>
             </div>
-          </div>
 
-          <div className="p-8 bg-white">
+            <div className="space-y-3 mb-6">
+              <Button
+                type="button"
+                onClick={handleGoogleSignIn}
+                variant="outline"
+                className="w-full h-12 bg-white hover:bg-gray-50 text-gray-900 border-0 font-medium"
+              >
+                <Chrome className="h-5 w-5 mr-3 text-blue-600" />
+                Google
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleGithubSignIn}
+                variant="outline"
+                className="w-full h-12 bg-white hover:bg-gray-50 text-gray-900 border-0 font-medium"
+              >
+                <Github className="h-5 w-5 mr-3" />
+                GitHub
+              </Button>
+            </div>
+
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-600" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-slate-800 px-3 text-gray-400">or continue with email</span>
+              </div>
+            </div>
+
             <form onSubmit={handleAuth} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
+                <label className="text-sm font-medium text-gray-300">
                   Email Address
-                </Label>
+                </label>
                 <Input
-                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@example.com"
+                  placeholder="Enter your email"
                   required
-                  className="h-11 border-2 focus:border-blue-500 transition-colors"
+                  className="h-12 bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
+                <label className="text-sm font-medium text-gray-300">
                   Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                  className="h-11 border-2 focus:border-blue-500 transition-colors"
-                />
+                </label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    required
+                    className="h-12 bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500 pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
               </div>
 
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    Confirm Password
-                  </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
-                    required
-                    className="h-11 border-2 focus:border-blue-500 transition-colors"
-                  />
+              {mode === 'signin' && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="remember"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                      className="border-gray-600 data-[state=checked]:bg-blue-600"
+                    />
+                    <label
+                      htmlFor="remember"
+                      className="text-sm text-gray-400 cursor-pointer"
+                    >
+                      Remember me
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
               )}
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all"
+                className="w-full h-12 bg-slate-700 hover:bg-slate-600 text-white font-medium"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -180,40 +218,25 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     Processing...
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2">
-                    {isSignUp ? (
-                      <>
-                        <UserIcon className="h-5 w-5" />
-                        Create Account
-                      </>
-                    ) : (
-                      <>
-                        Sign In
-                        <ArrowRight className="h-5 w-5" />
-                      </>
-                    )}
-                  </span>
+                  <>
+                    Sign {mode === 'signin' ? 'In' : 'Up'}
+                    <span className="ml-2">→</span>
+                  </>
                 )}
               </Button>
 
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-gray-200" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-500">or</span>
-                </div>
-              </div>
-
               <div className="text-center">
+                <span className="text-gray-400 text-sm">
+                  {mode === 'signin'
+                    ? "Don't have an account? "
+                    : "Already have an account? "}
+                </span>
                 <button
                   type="button"
-                  onClick={toggleMode}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-semibold hover:underline transition-colors"
+                  onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+                  className="text-blue-400 hover:text-blue-300 font-medium text-sm transition-colors"
                 >
-                  {isSignUp
-                    ? "Already have an account? Sign in"
-                    : "Don't have an account? Create one"}
+                  {mode === 'signin' ? 'Sign up' : 'Sign in'}
                 </button>
               </div>
             </form>
