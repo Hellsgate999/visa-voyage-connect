@@ -71,6 +71,12 @@ const AuthHeader = () => {
                 Home
               </button>
               <button
+                onClick={() => navigate("/countries")}
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Countries
+              </button>
+              <button
                 onClick={() => navigate("/visa-services")}
                 className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
               >
@@ -130,6 +136,15 @@ const AuthHeader = () => {
                   className="text-left text-gray-700 hover:text-blue-600 font-medium transition-colors"
                 >
                   Home
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/countries");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-left text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                >
+                  Countries
                 </button>
                 <button
                   onClick={() => {

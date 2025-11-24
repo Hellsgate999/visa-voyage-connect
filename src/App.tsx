@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Community from "./pages/Community";
 import VisaServices from "./pages/VisaServices";
+import Countries from "./pages/Countries";
 import AdminCountries from "./pages/AdminCountries";
 import NotFound from "./pages/NotFound";
 
@@ -20,6 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/visa-services" element={<VisaServices />} />
+          <Route path="/countries" element={<Countries />} />
           <Route path="/community" element={<Community />} />
           <Route path="/admin/countries" element={<AdminCountries />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
