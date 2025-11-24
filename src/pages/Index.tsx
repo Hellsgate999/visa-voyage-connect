@@ -2,12 +2,14 @@
 import { motion } from 'framer-motion';
 import { MessageSquare, Users, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AuthHeader from '@/components/layout/AuthHeader';
 
 const Index = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <AuthHeader />
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-20">
         <div className="container mx-auto px-4">
